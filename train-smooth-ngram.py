@@ -60,18 +60,23 @@ def Train(filename, order = 3, lid = 0.00001):
 
 
 def MakeFSA(ngram, order, startSymbol = '<s>'):
-    fsa = 'F\n'
+    fsa = 'F\n(F (F *e* 1.0))'
     for seq, char_prob in ngram.items():
         for char, prob in char_prob.items():
             # if all chars are start symbol
             if seq[-1] == '#':
                 fsa += '(F ({0} {1} {2}))\n'.format(
-                    seq[1 :] + char, char, prob
+                    seq[1 :] + char, startSymbol, prob
                 )
             else:
-                fsa += '({0} ({1} {2} {3}))\n'.format(
-                    seq, seq[1 :] + char, char, prob
-                )
+                if char == '$':
+                    fsa += '({0} (F {1} {2}))'.format(
+                        seq, '</s>', prob
+                    )
+                else:
+                    fsa += '({0} ({1} {2} {3}))\n'.format(
+                        seq, seq[1 :] + char, char, prob
+                    )
     return fsa
 
     

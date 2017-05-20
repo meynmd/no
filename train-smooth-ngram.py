@@ -13,17 +13,23 @@ def Load(filename):
 
 
 def Train(filename, order = 3, lid = 0.001):
-    data = (order - 1) * '#' + Load(filename)
-    data = string.lower(data)
-    
     # make set of chars
+    data = Load(filename)
     chars = set([c for c in data])
-    
+    data = string.lower(data)
+    data = (order - 1) * '#' + data
+
     # set up ngram dictionary with no nonzero values
     ngram = {}
     count = 0
     pre = [''.join([x for x in p]) for p in product(chars, repeat = order - 1)]
+    for i in range(order + 1):
+        pre += [i * '#' +
+            ''.join([x for x in p]) for p in product(chars, repeat = order - i)]
     for p in pre:
+    
+        print p
+    
         ngram[p] = {x : lid for x in chars}
         count += len(chars)
 
@@ -57,11 +63,11 @@ def MakeFSA(ngram, order, startSymbol = '<s>'):
         for char, prob in char_prob.items():
             # if all chars are start symbol
             if seq[-1] == '#':
-                fsa += '(F ({0} {1} {2}))'.format(
+                fsa += '(F ({0} {1} {2}))\n'.format(
                     seq + '_' + char, char, prob
                 )
             else:
-                fsa += '({0} ({1} {2} {3}))'.format(
+                fsa += '({0} ({1} {2} {3}))\n'.format(
                     seq, seq[1 :] + char, char, prob
                 )
     return fsa
@@ -99,6 +105,7 @@ def generate_text(ngram, order = 3, nletters = 1000):
 
 
 if __name__ == "__main__":
+    print 'Hello'
     order = int(sys.argv[2])
     filename = sys.argv[1]
     model = Train(filename, order)
@@ -111,4 +118,4 @@ if __name__ == "__main__":
 
     #print generate_text(model, order)
 
-    print MakeFSA(model, order)
+    #print MakeFSA(model, order)

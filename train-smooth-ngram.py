@@ -12,10 +12,11 @@ def Load(filename):
     return fp.read()
 
 
-def Train(filename, order = 3, lid = 0.001):
+def Train(filename, order = 3, lid = 0.00001):
     # make set of chars
     data = Load(filename)
     data = data.replace(' ', '_')
+    data = data.replace('\n', '$')
     chars = set([c for c in data])# if c != '\n'])
     #chars.add('*')
     data = string.lower(data)
@@ -65,7 +66,7 @@ def MakeFSA(ngram, order, startSymbol = '<s>'):
             # if all chars are start symbol
             if seq[-1] == '#':
                 fsa += '(F ({0} {1} {2}))\n'.format(
-                    seq + '_' + char, char, prob
+                    seq[1 :] + char, char, prob
                 )
             else:
                 fsa += '({0} ({1} {2} {3}))\n'.format(

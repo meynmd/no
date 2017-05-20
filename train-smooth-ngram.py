@@ -15,7 +15,9 @@ def Load(filename):
 def Train(filename, order = 3, lid = 0.001):
     # make set of chars
     data = Load(filename)
-    chars = set([c for c in data])
+    data = data.replace(' ', '_')
+    chars = set([c for c in data])# if c != '\n'])
+    #chars.add('*')
     data = string.lower(data)
     data = (order - 1) * '#' + data
 
@@ -23,13 +25,12 @@ def Train(filename, order = 3, lid = 0.001):
     ngram = {}
     count = 0
     pre = [''.join([x for x in p]) for p in product(chars, repeat = order - 1)]
-    for i in range(order + 1):
+    pre += (order - 1) * '#'
+    for i in range(1, order):
         pre += [i * '#' +
-            ''.join([x for x in p]) for p in product(chars, repeat = order - i)]
+            ''.join([x for x in p]) for p in product(chars, repeat = order - 1 - i)]
+    
     for p in pre:
-    
-        print p
-    
         ngram[p] = {x : lid for x in chars}
         count += len(chars)
 
@@ -105,7 +106,6 @@ def generate_text(ngram, order = 3, nletters = 1000):
 
 
 if __name__ == "__main__":
-    print 'Hello'
     order = int(sys.argv[2])
     filename = sys.argv[1]
     model = Train(filename, order)
@@ -118,4 +118,4 @@ if __name__ == "__main__":
 
     #print generate_text(model, order)
 
-    #print MakeFSA(model, order)
+    print MakeFSA(model, order)
